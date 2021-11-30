@@ -1,0 +1,14 @@
+material ARtrack/marker2_12cm
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture marker2_12cm.png
+			}
+		}
+	}
+}
+

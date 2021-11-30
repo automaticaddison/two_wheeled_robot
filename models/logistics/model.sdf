@@ -1,0 +1,22 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='Logistics_Lights'>
+    <static>true</static>
+    <link name="warehouse">
+      <visual name="visual">
+            <geometry>
+                <mesh>
+                    <uri>model://logistics/meshes/logistics_base.dae</uri>
+                </mesh>
+            </geometry>
+        </visual>
+        <collision name="collision">
+            <geometry>
+                <mesh>
+                    <uri>model://logistics/meshes/logistics_base.dae</uri>
+                </mesh>
+            </geometry>
+        </collision>
+    </link>
+  </model>
+</sdf>

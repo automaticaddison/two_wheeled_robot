@@ -1,0 +1,139 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='summit_docking_station'>
+
+    <link name='link_0'>
+
+      <pose frame=''>-0.071684 0.000885 0.135 0 -0 0</pose>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+             <uri>model://summit_docking_station/meshes/summit_docking_station.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://summit_docking_station/meshes/summit_docking_station.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </collision>
+
+    </link>
+
+
+    <link name='link_0_0'>
+      <pose frame=''>0.07 -0.18 0.36 0 -0 0</pose>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+             <size>0.001 0.071 0.12</size>
+          </box>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>200</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.001 0.071 0.12</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+
+    <link name='link_0_0_clone'>
+      <pose frame=''>0.07 0.18 0.36 0 -0 0</pose>
+      <visual name='visual_0'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.001 0.071 0.12</size>
+          </box>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>200</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.001 0.071 0.12</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+
+    <model name='marker1_border_12cm'>
+      <static>1</static>
+      <link name='marker1_border_12cm'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.001 0.14 0.14</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://summit_docking_station/material/scripts</uri>
+              <uri>model://summit_docking_station/material/textures</uri>
+              <name>ARtrack/marker1_border_12cm</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.001 0.14 0.14</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+
+
+      <pose frame=''>0.071684 -0.000885 0.355 0 -0 0</pose>
+    </model>
+    <static>1</static>
+    <allow_auto_disable>1</allow_auto_disable>
+  </model>
+</sdf>

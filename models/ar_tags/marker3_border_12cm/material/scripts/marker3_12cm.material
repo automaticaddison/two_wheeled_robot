@@ -1,0 +1,14 @@
+material ARtrack/marker3_border_12cm
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture marker3_border_12cm.png
+			}
+		}
+	}
+}
+

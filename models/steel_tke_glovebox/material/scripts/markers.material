@@ -1,0 +1,14 @@
+material ARtrack/markers
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture markers.png
+			}
+		}
+	}
+}
+

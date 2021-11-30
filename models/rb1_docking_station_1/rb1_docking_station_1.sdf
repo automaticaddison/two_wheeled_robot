@@ -1,0 +1,190 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='rb1_docking_station_1'>
+    <link name='link_0'>
+      <pose frame=''>0 0 0.0 0 -0 0.0</pose>
+      <inertial>
+         <mass>5.0</mass>
+        <inertia>
+          <ixx>0.166667</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.166667</iyy>
+          <iyz>0</iyz>
+          <izz>0.166667</izz>
+        </inertia>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+
+      <visual name='visual0'>
+        <pose frame=''>0.1225 0 -0.06 0 0 0</pose>
+        <geometry>
+          <mesh>
+		<uri>model://rb1_docking_station_1/meshes/rb1_docking_station.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      
+      <collision name='collision0'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0.0 -0.0 0.0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.245 0.456 0.12</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+    
+    <link name='link_qr_code'>
+      <pose frame=''>-0.114 0 0.1395 0 0 0</pose>
+      <gravity>1</gravity>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.002 0.14 0.14</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+		<uri>model://marker1_border_12cm/material/scripts</uri>
+		<uri>model://marker1_border_12cm/material/textures</uri>
+		<name>ARtrack/marker1_border_12cm</name>
+          </script>
+        </material>
+       
+      </visual>
+    </link>
+    
+    <link name='link_reflector_1'>
+      <pose frame=''>-0.114 0.173 0.134 0 0 0</pose>
+      <gravity>0</gravity>
+
+      <visual name='visual0'>
+        <pose frame=''>0 0 -0.0 0 -0 0</pose>
+        <geometry>
+          <box><size>0.005 0.07 0.05</size></box>
+        </geometry>
+	<material>
+          <lighting>1</lighting>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+      </visual>
+      <collision name='collision0'>
+        <pose frame=''>0 0 -0.0 0 -0 0</pose>
+        <geometry>
+          <box><size>0.002 0.07 0.1</size></box>
+        </geometry>
+	<laser_retro>8000</laser_retro>
+      </collision>
+    </link>
+    
+    <link name='link_reflector_2'>
+      <pose frame=''>-0.114 -0.173 0.134 0 0 0</pose>
+      <gravity>0</gravity>
+
+      <visual name='visual0'>
+        <pose frame=''>0 0 -0.0 0 -0 0</pose>
+        <geometry>
+          <box><size>0.002 0.07 0.05</size></box>
+        </geometry>
+	<material>
+          <lighting>1</lighting>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+      </visual>
+      <collision name='collision0'>
+        <pose frame=''>0 0 -0.0 0 -0 0</pose>
+        <geometry>
+          <box><size>0.005 0.07 0.1</size></box>
+        </geometry>
+	<laser_retro>8000</laser_retro>
+      </collision>
+    </link>
+    
+    <joint name='joint_0_to_reflector_1' type='fixed'>
+      <parent>link_0</parent>
+      <child>link_reflector_1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='joint_0_to_reflector_2' type='fixed'>
+      <parent>link_0</parent>
+      <child>link_reflector_2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='joint_0_to_marker' type='fixed'>
+      <parent>link_0</parent>
+      <child>link_qr_code</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+
+    <static>0</static>
+    <allow_auto_disable>1</allow_auto_disable>
+  </model>
+</sdf>

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+<model name="garden">
+  <static>true</static>
+    <link name="link">
+		
+	  <!-- TODO: Get own image for texture and figure out how to generate arbitrarily shaped environments -->
+	  
+	  <!-- Define first a large collision plane -->	
+      <collision name="collision">
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>100 100</size>
+          </plane>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>100</mu>
+              <mu2>50</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      
+      <!-- Now we define the visuals -->
+      <visual name="visual_0">
+		<pose>-2 0 0 0 0 0</pose>  
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>6 10</size>
+          </plane>
+        </geometry>
+        <material>
+		  <script>
+		    <uri>model://garden/materials/scripts</uri>
+		    <uri>model://garden/materials/textures</uri>
+		    <name>vrc/grass</name>	  
+		  </script>
+        </material>
+      </visual>
+      
+      <visual name="visual_1">
+		<pose>3 -2 0 0 0 0</pose>  
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>4 6</size>
+          </plane>
+        </geometry>
+        <material>
+		  <script>
+		    <uri>model://garden/materials/scripts</uri>
+		    <uri>model://garden/materials/textures</uri>
+		    <name>vrc/grass</name>	  
+		  </script>
+        </material>
+      </visual>
+      
+    </link>
+  </model>
+</sdf>

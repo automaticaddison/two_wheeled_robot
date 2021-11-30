@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="marker1_border_12cm">
+    <static>true</static>
+    <link name="marker1_border_12cm">
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.001 0.14 0.14</size>
+            <!-- SIZE OF THE MARKER + MARGIN -->
+          </box>
+        </geometry>
+        <material>
+          <script>
+	    <uri>model://marker1_border_12cm/material/scripts</uri>
+	    <uri>model://marker1_border_12cm/material/textures</uri>
+            <name>ARtrack/marker1_border_12cm</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.001 0.14 0.14</size>
+            <!-- SIZE OF THE MARKER + MARGIN -->
+          </box>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>
