@@ -29,22 +29,37 @@
           </box>
         </geometry>
         <material> 
-          <ambient>0.1 0.1 0.1 1</ambient>
-          <diffuse>0.1 0.1 0.1 1</diffuse>
+          <ambient>1.0 1.0 1.0 1</ambient>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
           <specular>0 0 0 0</specular>
           <emissive>0 0 0 1</emissive>
         </material> 
       </visual>
      </link>
     <link name="aruco_marker_link">
-      <pose>0.18 0.0 0.1 0 0 0</pose>
-      <visual name="visual">
+      <pose>0.18 0.0 0.2 3.1415 1.5708 0</pose>
+      <visual name='visual'>
         <geometry>
-          <mesh>
-            <uri>model://charging_dock_with_aruco/meshes/Marker0.dae</uri>
-	    <scale>0.4 0.4 0.4</scale>
-          </mesh>
+          <box>
+            <size>0.1778 0.1778 1e-5</size>
+          </box>
         </geometry>
+        <material>
+          <script>
+            <uri>model://charging_dock_with_aruco/materials/scripts</uri>
+            <uri>model://charging_dock_with_aruco/materials/textures</uri>
+            <name>ArucoVisualMarker7/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
       </visual>
     </link>
   </model>
