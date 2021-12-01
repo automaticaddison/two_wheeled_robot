@@ -1294,7 +1294,7 @@
     </include>
 
     <include>
-      <uri>model://charging_dock</uri>
+      <uri>model://charging_dock_with_aruco</uri>
       <static>true</static>
       <pose>-1.0 0.27 0.0 0 0 1.57</pose>
     </include>
