@@ -1288,7 +1288,7 @@
     </model>
 
     <include>
-      <uri>model://two_wheeled_robot_description</uri>
+      <uri>model://two_wheeled_robot_with_camera_description</uri>
       <static>false</static>
       <pose>0.0 2.0 0.25 0 0 0</pose>
     </include>
