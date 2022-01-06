@@ -48,7 +48,7 @@
           <script>
             <uri>model://charging_dock_with_aruco/materials/scripts</uri>
             <uri>model://charging_dock_with_aruco/materials/textures</uri>
-            <name>ArucoVisualMarker7/Marker</name>
+            <name>ArucoVisualMarker1/Marker</name>
           </script>
           <ambient>1 1 1 1</ambient>
           <diffuse>1 1 1 1</diffuse>
