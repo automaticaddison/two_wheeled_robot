@@ -225,7 +225,8 @@ def generate_launch_description():
   # Launch the ArUco marker pose transform
   start_aruco_marker_pose_transform_cmd = Node(
     package=package_name,
-    executable='aruco_marker_pose_estimation_tf.py')
+    executable='aruco_marker_pose_estimation_tf.py',
+    parameters=[{'use_sim_time': use_sim_time}])
 
   # Launch the ROS 2 Navigation Stack
   start_ros2_navigation_cmd = IncludeLaunchDescription(
