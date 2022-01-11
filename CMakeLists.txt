@@ -42,6 +42,7 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
+  scripts/aruco_marker_pose_estimation_tf.py
   scripts/run_inspection.py
   scripts/lift_controller.py
   scripts/nav_to_pose.py
