@@ -92,7 +92,7 @@ class ArucoNode(Node):
       self.listener_callback, 
       qos_profile=qos_profile_sensor_data)
     self.subscription # prevent unused variable warning
-      
+    
     # Initialize the transform broadcaster
     self.tfbroadcaster = TransformBroadcaster(self)
       
@@ -164,9 +164,8 @@ class ArucoNode(Node):
         # Draw the axes on the marker
         cv2.aruco.drawAxis(current_frame, self.mtx, self.dst, rvecs[i], tvecs[i], 0.05)        
               
-    # Display image
+    # Display image for testing
     cv2.imshow("camera", current_frame)
-    
     cv2.waitKey(1)
   
 def main(args=None):
