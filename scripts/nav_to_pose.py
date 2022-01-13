@@ -21,7 +21,7 @@ from geometry_msgs.msg import PoseStamped # Pose with ref frame and timestamp
 from rclpy.duration import Duration # Handles time for ROS 2
 import rclpy # Python client library for ROS 2
 
-from robot_navigator import BasicNavigator, NavigationResult # Helper module
+from nav2_simple_commander.robot_navigator import BasicNavigator, NavigationResult 
 
 '''
 Navigates a robot from an initial pose to a goal pose.
@@ -67,9 +67,9 @@ def main():
   goal_pose = PoseStamped()
   goal_pose.header.frame_id = 'map'
   goal_pose.header.stamp = navigator.get_clock().now().to_msg()
-  goal_pose.pose.position.x = 10.0
-  goal_pose.pose.position.y = -2.0
-  goal_pose.pose.position.z = 0.0
+  goal_pose.pose.position.x = 4.0
+  goal_pose.pose.position.y = 1.0
+  goal_pose.pose.position.z = 0.25
   goal_pose.pose.orientation.x = 0.0
   goal_pose.pose.orientation.y = 0.0
   goal_pose.pose.orientation.z = 0.0

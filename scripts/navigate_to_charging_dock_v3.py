@@ -27,7 +27,7 @@ from rclpy.duration import Duration # Handles time for ROS 2
 import rclpy # Python client library for ROS 2
 from rclpy.node import Node # Handles the creation of nodes
 from rclpy.executors import MultiThreadedExecutor
-from robot_navigator import BasicNavigator, NavigationResult # Helper module
+from nav2_simple_commander.robot_navigator import BasicNavigator, NavigationResult # Helper module
 from geometry_msgs.msg import PoseStamped # Pose with ref frame and timestamp
 from geometry_msgs.msg import Twist # Velocity command
 from sensor_msgs.msg import BatteryState # Battery status
