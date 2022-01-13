@@ -227,6 +227,14 @@ def generate_launch_description():
     package=package_name,
     executable='aruco_marker_pose_estimation_tf.py',
     parameters=[{'use_sim_time': use_sim_time}])
+    
+  # Launch the ArUco marker pose static transform
+  start_aruco_marker_pose_static_transform_cmd = Node(
+    package="tf2_ros",
+    executable='static_transform_publisher',
+    arguments=["-1.0", "0.50", "0.53", "0", "3.141592654", "-1.57079633", "map", "aruco_marker"],
+    parameters=[{'use_sim_time': use_sim_time}],
+    output="screen")
 
   # Launch the ROS 2 Navigation Stack
   start_ros2_navigation_cmd = IncludeLaunchDescription(
@@ -268,7 +276,8 @@ def generate_launch_description():
   ld.add_action(start_rviz_cmd)
   ld.add_action(start_navigate_to_charging_dock_cmd)
   ld.add_action(start_map_to_base_link_transform_cmd)
-  ld.add_action(start_aruco_marker_pose_transform_cmd)
+  #ld.add_action(start_aruco_marker_pose_transform_cmd)
+  ld.add_action(start_aruco_marker_pose_static_transform_cmd)
   ld.add_action(start_ros2_navigation_cmd)
 
   return ld
