@@ -52,9 +52,14 @@ install(PROGRAMS
   scripts/security_demo.py
   scripts/waypoint_follower.py
   scripts/battery_state/battery_state_pub.py
+  scripts/battery_state/charging_battery_pub.py
+  scripts/battery_state/full_battery_pub.py
+  scripts/battery_state/low_battery_pub.py
   scripts/navigate_to_charging_dock.py
   scripts/navigate_to_charging_dock_v2.py
+  scripts/navigate_to_charging_dock_v3.py
   scripts/transforms/map_to_base_link_transform.py
+  scripts/transforms/base_link_to_aruco_marker_transform.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
