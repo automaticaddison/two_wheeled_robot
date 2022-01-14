@@ -3,6 +3,8 @@
 """
 Description:
   Navigate to a charging dock once the battery gets low.
+  This script works with the static transform publisher for the Aruco marker.
+  We assume we have hardcoded the exact position and orientation of the ArUco marker. 
 -------
 Subscription Topics:
   Current battery state
