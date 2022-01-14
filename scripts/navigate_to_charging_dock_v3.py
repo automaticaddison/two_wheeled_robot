@@ -33,9 +33,10 @@ from geometry_msgs.msg import Twist # Velocity command
 from sensor_msgs.msg import BatteryState # Battery status
 from std_msgs.msg import Float64MultiArray # Handle float64 arrays
 
-# Holds the current pose of the robot
+# Holds the current pose of the aruco_marker
+# base_link (parent frame) -> aruco_marker (child frame)
 current_x = 0.0
-current_y = 2.0
+current_y = 0.0
 current_yaw_angle = 0.0
 
 # Holds the current state of the battery
@@ -64,27 +65,27 @@ class ConnectToChargingDockNavigator(Node):
       timer_period = 0.1
       self.timer = self.create_timer(timer_period, self.navigate_to_dock_staging_area)
 
-      # Holds the goal poses of the robot 
-      # parent frame: base_link
-      # child_frame: aruco_marker
-      self.goal_x = [1.5, 1.0, 0.33]
-      self.goal_y = [0.0, 0.0, 0.0]
-      self.goal_yaw_angle = [-1.5708, -1.5708, -1.5708]
-
-      # Keep track of which goal we're headed towards
-      self.goal_idx = 0
-
       # Declare linear and angular velocities
       self.linear_velocity = 0.08  # meters per second
       self.angular_velocity = 0.1 # radians per second
+      
+      # Keep track of which goal we're headed towards
+      self.goal_idx = 0
+
+      # Holds the goal pose of the robot
+      # Parent frame: base_link
+      # Child frame: aruco_marker
+      self.goal_x = 0.36
+      self.goal_y = 0.0
+      self.goal_yaw_angle = -1.5708
 
       # Declare distance metrics in meters
       self.distance_goal_tolerance = 0.05
       self.reached_distance_goal = False      
 
       # Declare angle metrics in radians
-      self.heading_tolerance = 0.05
       self.yaw_goal_tolerance = 0.05
+      self.reached_yaw_angle_goal = False 
         
     def navigate_to_dock_staging_area(self):
       """
@@ -113,7 +114,9 @@ class ConnectToChargingDockNavigator(Node):
       # global_costmap = navigator.getGlobalCostmap()
       # local_costmap = navigator.getLocalCostmap()
 
-      # Set the robot's staging area pose
+      # Set the robot's staging area pose 
+      # map (parent frame)
+      # base_link (child frame)
       staging_area_pose = PoseStamped()
       staging_area_pose.header.frame_id = 'map'
       staging_area_pose.header.stamp = navigator.get_clock().now().to_msg()
@@ -149,15 +152,15 @@ class ConnectToChargingDockNavigator(Node):
       result = navigator.getResult()
       
       if result == NavigationResult.SUCCEEDED:
-        print('Successfully reached charging dock staging area...')
+        self.get_logger().info('Successfully reached charging dock staging area...')
         low_battery = False
         self.connect_to_dock()
       elif result == NavigationResult.CANCELED:
-        print('Goal was canceled!')
+        self.get_logger().info('Goal was canceled!')
       elif result == NavigationResult.FAILED:
-        print('Goal failed!')
+        self.get_logger().info('Goal failed!')
       else:
-        print('Goal has an invalid return status!')  
+        self.get_logger().info('Goal has an invalid return status!')  
         
     def connect_to_dock(self): 
       """
@@ -174,8 +177,8 @@ class ConnectToChargingDockNavigator(Node):
           self.go_to_line()
           self.get_logger().info('Going to perpendicular line to ArUco marker...')
         elif (self.goal_idx == 1):
-          self.go_to_line()
-          self.get_logger().info('Going to the ArUco marker...')
+          self.align_with_aruco_marker()
+          self.get_logger().info('Aligning with the ArUco marker...')
         elif (self.goal_idx == 2):
           self.go_to_aruco_marker()
           self.get_logger().info('Going to the ArUco marker...')
@@ -197,32 +200,21 @@ class ConnectToChargingDockNavigator(Node):
       Get the distance between the current x,y coordinate and the desired x,y coordinate
       The unit is meters.
       """
-      distance_to_goal = math.sqrt(math.pow(self.goal_x[self.goal_idx] - current_x, 2) + math.pow(
-        self.goal_y[self.goal_idx] - current_y, 2))
+      distance_to_goal = math.sqrt(math.pow(self.goal_x - current_x, 2) + math.pow(
+        self.goal_y - current_y, 2))
       return distance_to_goal
         
-    def get_heading_error(self):
-      """
-      Get the heading error in radians
-      """
-      delta_x = self.goal_x[self.goal_idx] - current_x
-      delta_y = self.goal_y[self.goal_idx] - current_y
-      desired_heading = math.atan2(delta_y, delta_x) 
-      heading_error = desired_heading - current_yaw_angle
-      
-      # Make sure the heading error falls within -PI to PI range
-      if (heading_error > math.pi):
-        heading_error = heading_error - (2 * math.pi)
-      if (heading_error < -math.pi):
-        heading_error = heading_error + (2 * math.pi)
-      
-      return heading_error
-      
     def get_radians_to_goal(self):
       """
       Get the yaw goal angle error in radians
       """
-      yaw_goal_angle_error = self.goal_yaw_angle[self.goal_idx] - current_yaw_angle
+      yaw_goal_angle_error = self.goal_yaw_angle - current_yaw_angle
+
+      # Make sure the yaw angle error falls within -PI to PI range
+      if (yaw_goal_angle_error > math.pi):
+        yaw_goal_angle_error = yaw_goal_angle_error - (2 * math.pi)
+      if (yaw_goal_angle_error < -math.pi):
+        yaw_goal_angle_error = yaw_goal_angle_error + (2 * math.pi)
       
       return yaw_goal_angle_error
       
@@ -230,81 +222,72 @@ class ConnectToChargingDockNavigator(Node):
       """
       Go to the line that is perpendicular to the ArUco marker
       """
-      distance_to_goal = self.get_distance_to_goal()
-      heading_error = self.get_heading_error()
+      distance_to_goal = math.fabs(current_x)
+      yaw_goal_error = current_yaw_angle
+      
+      # Create a velocity message
+      cmd_vel_msg = Twist()
+
+      # Orient towards the yaw goal angle
+      if (math.fabs(yaw_goal_error) > self.yaw_goal_tolerance and self.reached_yaw_angle_goal == False):
+        cmd_vel_msg.angular.z = self.angular_velocity      
+      
+      # If we are not yet at the target x position, go there now.
+      elif (distance_to_goal > self.distance_goal_tolerance):
+        self.reached_yaw_angle_goal = True
+        
+        if current_x > 0:
+          cmd_vel_msg.linear.x = self.linear_velocity
+        else: 
+          cmd_vel_msg.linear.x = -self.linear_velocity
+      
+      # Reached perpendicular line 
+      else:
+        # Go to the next goal
+        self.goal_idx = self.goal_idx + 1    
+        self.get_logger().info('Going to the ArUco marker...')
+        self.reached_yaw_angle_goal = False
+
+      # Publish the velocity message  
+      self.publisher_cmd_vel.publish(cmd_vel_msg) 
+
+    def align_with_aruco_marker(self):
+      """
+      Align with the ArUco marker
+      """
       yaw_goal_error = self.get_radians_to_goal()
       
       # Create a velocity message
       cmd_vel_msg = Twist()
+
+      # Orient towards the yaw goal angle
+      if (math.fabs(yaw_goal_error) > self.yaw_goal_tolerance and self.reached_yaw_angle_goal == False):
+        cmd_vel_msg.angular.z = self.angular_velocity      
       
-      # If we are not yet at the target x, y position, go there now.
-      if (math.fabs(distance_to_goal) > self.distance_goal_tolerance and self.reached_distance_goal == False):
-        
-        # If the robot's heading is off, fix it
-        if (math.fabs(heading_error) > self.heading_tolerance):
-        
-          self.get_logger().info(str(heading_error))
-        
-          if heading_error > 0:
-            cmd_vel_msg.angular.z = self.angular_velocity
-          else:
-            cmd_vel_msg.angular.z = -self.angular_velocity
-        else:
-          cmd_vel_msg.linear.x = self.linear_velocity
-        
-      # Otherwise, orient towards the yaw goal angle
-      elif (math.fabs(yaw_goal_error) > self.yaw_goal_tolerance):
-        
-        if yaw_goal_error > 0:
-          cmd_vel_msg.angular.z = self.angular_velocity
-        else:
-          cmd_vel_msg.angular.z = -self.angular_velocity
-        
-        self.reached_distance_goal = True
-      
-      # Goal position and orientation achieved, go to the next goal  
       else:
         # Go to the next goal
         self.goal_idx = self.goal_idx + 1    
-        self.get_logger().info('Arrived at perpendicular line. Going to the ArUco marker...')
-        self.reached_distance_goal = False     
+        self.get_logger().info('Going to the ArUco marker...')
 
       # Publish the velocity message  
       self.publisher_cmd_vel.publish(cmd_vel_msg) 
-      
+            
     def go_to_aruco_marker(self):
       """
       Go straight to the ArUco marker
       """
       distance_to_goal = self.get_distance_to_goal()
-      heading_error = self.get_heading_error()
       yaw_goal_error = self.get_radians_to_goal()
-      
+            
       cmd_vel_msg = Twist()
       
       # If we are not yet at the target x, y position, go there now.
-      if (math.fabs(distance_to_goal) > self.distance_goal_tolerance and self.reached_distance_goal == False):
-        
-        # If the robot's heading is off, fix it
-        if (math.fabs(heading_error) > self.heading_tolerance):
-        
-          if heading_error > 0:
-            cmd_vel_msg.angular.z = self.angular_velocity
-          else:
-            cmd_vel_msg.angular.z = -self.angular_velocity
-        else:
-          cmd_vel_msg.linear.x = self.linear_velocity
-        
-      # Otherwise, orient towards the yaw goal angle
-      elif (math.fabs(yaw_goal_error) > self.yaw_goal_tolerance):
-        
-        if yaw_goal_error > 0:
-          cmd_vel_msg.angular.z = self.angular_velocity
-        else:
-          cmd_vel_msg.angular.z = -self.angular_velocity
-        
-        self.reached_distance_goal = True
-      
+      if (current_y > self.distance_goal_tolerance and self.reached_distance_goal == False):
+        cmd_vel_msg.angular.z = self.angular_velocity 
+      elif (current_y < -self.distance_goal_tolerance and self.reached_distance_goal == False):
+        cmd_vel_msg.angular.z = -self.angular_velocity 
+      elif (math.fabs(distance_to_goal) > self.distance_goal_tolerance and self.reached_distance_goal == False):
+        cmd_vel_msg.linear.x = self.linear_velocity        
       # Goal position and orientation achieved
       else:
         self.goal_idx = self.goal_idx + 1 
