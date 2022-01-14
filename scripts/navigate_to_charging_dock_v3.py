@@ -281,7 +281,7 @@ class ConnectToChargingDockNavigator(Node):
             
       cmd_vel_msg = Twist()
       
-      # If we are not yet at the target x, y position, go there now.
+      # Follow the perpendicular line to the ArUco marker
       if (current_y > self.distance_goal_tolerance and self.reached_distance_goal == False):
         cmd_vel_msg.angular.z = self.angular_velocity 
       elif (current_y < -self.distance_goal_tolerance and self.reached_distance_goal == False):
