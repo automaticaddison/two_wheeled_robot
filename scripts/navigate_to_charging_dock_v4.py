@@ -43,7 +43,6 @@ from geometry_msgs.msg import PoseStamped # Pose with ref frame and timestamp
 from geometry_msgs.msg import Twist # Velocity command
 from sensor_msgs.msg import BatteryState # Battery status
 from sensor_msgs.msg import LaserScan # Handle LIDAR scans
-from std_msgs.msg import Float64MultiArray # Handle float64 arrays  ###############################Remove this later
 from std_msgs.msg import Bool # Handle boolean values
 from std_msgs.msg import Int32 # Handle integer values
 
@@ -94,21 +93,15 @@ class ConnectToChargingDockNavigator(Node):
       
       # Keep track of which goal we're headed towards
       self.goal_idx = 0
+      
+      # Declare obstacle tolerance 
+      self.obstacle_tolerance = 0.30
+      
+      # Declare the acceptable distance away from the charging to still see the ArUco marker
+      self.aruco_marker_view_tolerance = 0.50
 
-      # Holds the goal pose of the robot
-      # Parent frame: base_link
-      # Child frame: aruco_marker
-      self.goal_x = 0.36
-      self.goal_y = 0.0
-      self.goal_yaw_angle = -1.5708
-
-      # Declare distance metrics in meters
-      self.distance_goal_tolerance = 0.05
-      self.reached_distance_goal = False      
-
-      # Declare angle metrics in radians
-      self.yaw_goal_tolerance = 0.05
-      self.reached_yaw_angle_goal = False 
+      # Center offset tolerance in pixels
+      self.center_offset_tolerance = 10
         
     def navigate_to_dock_staging_area(self):
       """
@@ -143,8 +136,8 @@ class ConnectToChargingDockNavigator(Node):
       staging_area_pose = PoseStamped()
       staging_area_pose.header.frame_id = 'map'
       staging_area_pose.header.stamp = navigator.get_clock().now().to_msg()
-      staging_area_pose.pose.position.x = 0.0
-      staging_area_pose.pose.position.y = 2.0
+      staging_area_pose.pose.position.x = -1.0
+      staging_area_pose.pose.position.y = 2.5
       staging_area_pose.pose.position.z = 0.25
       staging_area_pose.pose.orientation.x = 0.0
       staging_area_pose.pose.orientation.y = 0.0
@@ -187,7 +180,7 @@ class ConnectToChargingDockNavigator(Node):
         
     def connect_to_dock(self): 
       """
-      Navigate and connect to the charging dock.
+      Go to the charging dock.
       """ 
       
       # While the battery is not charging
@@ -197,17 +190,11 @@ class ConnectToChargingDockNavigator(Node):
         self.get_logger().info('NOT CHARGING...')
         
         if (self.goal_idx == 0):
-          self.go_to_line()
-          self.get_logger().info('Going to perpendicular line to ArUco marker...')
-          self.get_logger().info("Obstacle detected at '{}' meters".format(aruco_marker_detected)) 
+          self.search_for_aruco_marker()
+          self.get_logger().info('Searching for the ArUco marker...')
         elif (self.goal_idx == 1):
-          self.align_with_aruco_marker()
-          self.get_logger().info('Aligning with the ArUco marker...')
-          self.get_logger().info("Obstacle detected at '{}' meters".format(aruco_marker_detected))
-        elif (self.goal_idx == 2):
-          self.go_to_aruco_marker()
-          self.get_logger().info('Going to the ArUco marker...')
-          self.get_logger().info("Obstacle detected at '{}' meters".format(aruco_marker_detected))
+          self.get_logger().info('Navigating to the ArUco marker...')
+          self.get_logger().info("Obstacle detected at '{}' meters".format(obstacle_distance_front))
         else:
           # Stop the robot
           cmd_vel_msg = Twist()
@@ -215,13 +202,28 @@ class ConnectToChargingDockNavigator(Node):
           cmd_vel_msg.angular.z = 0.0
           self.publisher_cmd_vel.publish(cmd_vel_msg)
           self.get_logger().info('Robot is idle...')
-          self.get_logger().info("Obstacle detected at '{}' meters".format(aruco_marker_detected)) 
+          self.get_logger().info("Obstacle detected at '{}' meters".format(obstacle_distance_front)) 
     
         time.sleep(0.02)
     
       self.get_logger().info('CHARGING...')
       self.get_logger().info('Successfully connected to the charging dock!')
-    
+
+    def search_for_aruco_marker(self):
+      """
+      Rotate around until the robot finds the charging dock
+      """
+      if aruco_marker_detected == False:
+      
+        # Create a velocity message
+        cmd_vel_msg = Twist()
+        cmd_vel_msg.angular.z = -self.angular_velocity           
+      
+        # Publish the velocity message  
+        self.publisher_cmd_vel.publish(cmd_vel_msg) 
+      else: 
+        self.goal_idx = 1
+
     def get_distance_to_goal(self):
       """
       Get the distance between the current x,y coordinate and the desired x,y coordinate
