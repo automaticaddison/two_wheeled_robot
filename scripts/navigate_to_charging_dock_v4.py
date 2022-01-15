@@ -89,19 +89,19 @@ class ConnectToChargingDockNavigator(Node):
 
       # Declare linear and angular velocities
       self.linear_velocity = 0.08  # meters per second
-      self.angular_velocity = 0.1 # radians per second
+      self.angular_velocity = 0.03 # radians per second
       
       # Keep track of which goal we're headed towards
       self.goal_idx = 0
       
       # Declare obstacle tolerance 
-      self.obstacle_tolerance = 0.30
-      
-      # Declare the acceptable distance away from the charging to still see the ArUco marker
-      self.aruco_marker_view_tolerance = 0.50
+      self.obstacle_tolerance = 0.22
 
       # Center offset tolerance in pixels
       self.center_offset_tolerance = 10
+      
+      # Undocking distance
+      self.undocking_distance = 0.50
         
     def navigate_to_dock_staging_area(self):
       """
@@ -170,6 +170,7 @@ class ConnectToChargingDockNavigator(Node):
       if result == NavigationResult.SUCCEEDED:
         self.get_logger().info('Successfully reached charging dock staging area...')
         low_battery = False
+        navigator.cancelNav()
         self.connect_to_dock()
       elif result == NavigationResult.CANCELED:
         self.get_logger().info('Goal was canceled!')
@@ -187,27 +188,50 @@ class ConnectToChargingDockNavigator(Node):
       while this_battery_state.power_supply_status != 1:
     
         # Publish the current battery state
-        self.get_logger().info('NOT CHARGING...')
+        #self.get_logger().info('NOT CHARGING...')
         
         if (self.goal_idx == 0):
           self.search_for_aruco_marker()
           self.get_logger().info('Searching for the ArUco marker...')
         elif (self.goal_idx == 1):
+          self.navigate_to_aruco_marker()
           self.get_logger().info('Navigating to the ArUco marker...')
-          self.get_logger().info("Obstacle detected at '{}' meters".format(obstacle_distance_front))
         else:
           # Stop the robot
           cmd_vel_msg = Twist()
           cmd_vel_msg.linear.x = 0.0
           cmd_vel_msg.angular.z = 0.0
           self.publisher_cmd_vel.publish(cmd_vel_msg)
-          self.get_logger().info('Robot is idle...')
-          self.get_logger().info("Obstacle detected at '{}' meters".format(obstacle_distance_front)) 
+          self.get_logger().info('Arrived at charging dock. Robot is idle...')
     
         time.sleep(0.02)
     
       self.get_logger().info('CHARGING...')
       self.get_logger().info('Successfully connected to the charging dock!')
+      cmd_vel_msg = Twist()
+      cmd_vel_msg.linear.x = 0.0
+      cmd_vel_msg.angular.z = 0.0
+      self.publisher_cmd_vel.publish(cmd_vel_msg)
+      
+      # Reset the node
+      self.goal_idx = 0
+
+      # While the battery is not full
+      while this_battery_state.percentage != 1.0:      
+        self.get_logger().info('CHARGING...')
+        
+      # Undock from the docking station
+      cmd_vel_msg = Twist()
+      cmd_vel_msg.linear.x = -self.linear_velocity
+      self.publisher_cmd_vel.publish(cmd_vel_msg)
+      while obstacle_distance_front < self.undocking_distance:
+        self.get_logger().info('Undocking from the charging dock...')
+
+      # Stop the robot
+      cmd_vel_msg = Twist()
+      cmd_vel_msg.linear.x = 0.0     
+      self.publisher_cmd_vel.publish(cmd_vel_msg)
+      self.get_logger().info('Ready for my next goal!')
 
     def search_for_aruco_marker(self):
       """
@@ -223,6 +247,42 @@ class ConnectToChargingDockNavigator(Node):
         self.publisher_cmd_vel.publish(cmd_vel_msg) 
       else: 
         self.goal_idx = 1
+        
+    def navigate_to_aruco_marker(self):
+      """
+      Go straight to the ArUco marker
+      """
+      # If we have detected the ArUco marker and there are no obstacles in the way
+      if aruco_marker_detected and (obstacle_distance_front > self.obstacle_tolerance):
+        self.adjust_heading()
+      # If we have detected the ArUco marker and there are obstacles in the way, we have reached the charging dock
+      elif aruco_marker_detected and (obstacle_distance_front <= self.obstacle_tolerance):
+        self.goal_idx = 2
+      # If we have not detected the ArUco marker, and there is an obstacle in the way at a close distance,
+      # we have reached the charging dock
+      elif not aruco_marker_detected and (obstacle_distance_front <= self.obstacle_tolerance):
+        self.goal_idx = 2   
+      # Search for charging dock  
+      else:
+        self.goal_idx = 0
+      
+    def adjust_heading(self):
+      """
+      Adjust heading to keep the Aruco marker centerpoint centererd.
+      """
+      cmd_vel_msg = Twist()
+      if aruco_center_offset < -self.center_offset_tolerance:
+        # Turn left
+        cmd_vel_msg.angular.z = self.angular_velocity   
+      elif aruco_center_offset > self.center_offset_tolerance:  
+        # Turn right       
+        cmd_vel_msg.angular.z = -self.angular_velocity 
+      else:
+        # Go straight
+        cmd_vel_msg.linear.x = self.linear_velocity 
+        
+      # Publish the velocity message  
+      self.publisher_cmd_vel.publish(cmd_vel_msg)  
 
 class BatteryStateSubscriber(Node):
     """
